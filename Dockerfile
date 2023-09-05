@@ -32,23 +32,13 @@ RUN apt-get update && \
     python3.10 get-pip.py && \
     rm -rf /var/lib/apt/lists/*
 
-
-RUN useradd -o -u 1000 user
-
-USER user
-
-ENV HOME=/home/user \
-	PATH=/home/user/.local/bin:$PATH
-
-WORKDIR $HOME/app
-
-COPY --chown=user:user . $HOME/app    
+COPY . /
 
 RUN python3.10 -m pip install --no-cache-dir -r requirements.txt
 RUN python3.10 -m pip install --no-cache-dir diff-gaussian-rasterization/
 RUN python3.10 -m pip install --no-cache-dir VideoProcessingFramework/
 RUN python3.10 -m pip install --no-cache-dir VideoProcessingFramework/src/PytorchNvCodec/
 
-EXPOSE 7860
+EXPOSE 80
 
-CMD ["python3.10", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["python3.10", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
