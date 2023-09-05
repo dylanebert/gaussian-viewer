@@ -1,0 +1,5 @@
+.vscode/*
+!.vscode/launch.json
+venv/
+VideoProcessingFramework/*
+diff-gaussian-rasterization/*

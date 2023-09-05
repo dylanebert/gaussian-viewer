@@ -1,0 +1,6 @@
+[submodule "diff-gaussian-rasterization"]
+	path = diff-gaussian-rasterization
+	url = https://github.com/graphdeco-inria/diff-gaussian-rasterization.git
+[submodule "VideoProcessingFramework"]
+	path = VideoProcessingFramework
+	url = https://github.com/NVIDIA/VideoProcessingFramework.git
