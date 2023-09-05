@@ -7,11 +7,10 @@ import av
 from aiortc import RTCPeerConnection, RTCSessionDescription, VideoStreamTrack
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from scipy.spatial.transform import Rotation
 
-logging.basicConfig(level=logging.WARN)
+logging.basicConfig(level=logging.INFO)
 
 from src import Camera, GaussianModel, Renderer, get_ice_servers
 
@@ -162,6 +161,3 @@ async def create_offer(offer: Offer, session_id: str = Query(...)):
 @app.get("/ice-servers")
 async def get_ice():
     return get_ice_servers()
-
-
-app.mount("/", StaticFiles(directory="public", html=True), name="public")
