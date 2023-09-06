@@ -4,7 +4,7 @@ import time
 import traceback
 
 import av
-from aiortc import RTCPeerConnection, RTCSessionDescription, RTCIceCandidate, VideoStreamTrack
+from aiortc import RTCPeerConnection, RTCSessionDescription, RTCIceCandidate, RTCConfiguration, VideoStreamTrack
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -145,7 +145,7 @@ async def create_offer(offer: Offer, session_id: str = Query(...)):
     logging.info(f"Creating offer for session {session_id}")
 
     pc = RTCPeerConnection()
-    pc.configuration.iceServers = get_ice_servers()
+    pc.configuration = RTCConfiguration(iceServers=get_ice_servers())
     session = create_session(session_id, pc)
     track = FrameProducer(session)
     pc.addTrack(track)
