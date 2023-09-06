@@ -39,6 +39,6 @@ RUN python3.10 -m pip install --no-cache-dir diff-gaussian-rasterization/
 RUN python3.10 -m pip install --no-cache-dir VideoProcessingFramework/
 RUN python3.10 -m pip install --no-cache-dir VideoProcessingFramework/src/PytorchNvCodec/
 
-EXPOSE 80
+EXPOSE 443
 
-CMD ["python3.10", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["python3.10", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "443", "--ssl-keyfile", "privkey.pem", "--ssl-certfile", "fullchain.pem"]

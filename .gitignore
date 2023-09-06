@@ -4,3 +4,6 @@ venv/
 VideoProcessingFramework/*
 diff-gaussian-rasterization/*
 models/*
+*.crt
+*.key
+*.pem
