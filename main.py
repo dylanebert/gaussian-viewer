@@ -1,3 +1,4 @@
+import re
 import json
 import logging
 import time
@@ -66,6 +67,13 @@ class Offer(BaseModel):
     type: str
 
 
+class IceCandidate(BaseModel):
+    candidate: str
+    sdpMLineIndex: int
+    sdpMid: str
+    usernameFragment: str
+
+
 class Session:
     session_id: str
     renderer: Renderer
@@ -75,12 +83,6 @@ class Session:
         self.session_id = session_id
         self.renderer = renderer
         self.pc = pc
-
-
-class ICECandidate(BaseModel):
-    candidate: str
-    sdpMid: str
-    sdpMLineIndex: int
 
 
 class FrameProducer(VideoStreamTrack):
@@ -131,13 +133,27 @@ class FrameProducer(VideoStreamTrack):
 
 
 @app.post("/ice-candidate")
-async def add_ice_candidate(candidate: ICECandidate, session_id: str = Query(...)):
+async def add_ice_candidate(candidate: IceCandidate, session_id: str = Query(...)):
     logging.info(f"Adding ICE candidate for session {session_id}")
     pc = sessions[session_id].pc
-    ice_candidate = RTCIceCandidate(
-        candidate=candidate.candidate, sdpMid=candidate.sdpMid, sdpMLineIndex=candidate.sdpMLineIndex
-    )
-    await pc.addIceCandidate(ice_candidate)
+    pattern = r"candidate:(\d+) (\d+) (\w+) (\d+) (\S+) (\d+) typ (\w+)"
+    match = re.match(pattern, candidate.candidate)
+    if match:
+        foundation, component, protocol, priority, ip, port, typ = match.groups()
+        ice_candidate = RTCIceCandidate(
+            component=int(component),
+            foundation=foundation,
+            ip=ip,
+            port=int(port),
+            priority=int(priority),
+            protocol=protocol,
+            type=typ,
+            sdpMid=candidate.sdpMid,
+            sdpMLineIndex=candidate.sdpMLineIndex,
+        )
+        await pc.addIceCandidate(ice_candidate)
+    else:
+        logging.error(f"Failed to parse ICE candidate: {candidate.candidate}")
 
 
 @app.post("/offer")
