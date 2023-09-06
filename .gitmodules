@@ -4,3 +4,6 @@
 [submodule "VideoProcessingFramework"]
 	path = VideoProcessingFramework
 	url = https://github.com/NVIDIA/VideoProcessingFramework.git
+[submodule "gaussian-viewer-frontend"]
+	path = gaussian-viewer-frontend
+	url = https://github.com/dylanebert/gaussian-viewer-frontend.git
