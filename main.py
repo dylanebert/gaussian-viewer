@@ -4,7 +4,7 @@ import time
 import traceback
 
 import av
-from aiortc import RTCPeerConnection, RTCSessionDescription, VideoStreamTrack
+from aiortc import RTCPeerConnection, RTCSessionDescription, RTCIceCandidate, VideoStreamTrack
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -53,6 +53,14 @@ def parse_frame(container, data):
     return None
 
 
+def create_session(session_id, pc):
+    camera = Camera().load(cam_info)
+    renderer = Renderer(gaussian_model, camera, logging=False)
+    session = Session(session_id, renderer, pc)
+    sessions[session_id] = session
+    return session
+
+
 class Offer(BaseModel):
     sdp: str
     type: str
@@ -61,10 +69,18 @@ class Offer(BaseModel):
 class Session:
     session_id: str
     renderer: Renderer
+    pc: RTCPeerConnection
 
-    def __init__(self, session_id: str, renderer: Renderer):
+    def __init__(self, session_id: str, renderer: Renderer, pc: RTCPeerConnection):
         self.session_id = session_id
         self.renderer = renderer
+        self.pc = pc
+
+
+class ICECandidate(BaseModel):
+    candidate: str
+    sdpMid: str
+    sdpMLineIndex: int
 
 
 class FrameProducer(VideoStreamTrack):
@@ -114,18 +130,23 @@ class FrameProducer(VideoStreamTrack):
         return frame
 
 
+@app.post("/ice-candidate")
+async def add_ice_candidate(candidate: ICECandidate, session_id: str = Query(...)):
+    logging.info(f"Adding ICE candidate for session {session_id}")
+    pc = sessions[session_id].pc
+    ice_candidate = RTCIceCandidate(
+        candidate=candidate.candidate, sdpMid=candidate.sdpMid, sdpMLineIndex=candidate.sdpMLineIndex
+    )
+    await pc.addIceCandidate(ice_candidate)
+
+
 @app.post("/offer")
 async def create_offer(offer: Offer, session_id: str = Query(...)):
     logging.info(f"Creating offer for session {session_id}")
 
-    session = sessions.get(session_id, None)
-    if session is None:
-        camera = Camera().load(cam_info)
-        renderer = Renderer(gaussian_model, camera, logging=False)
-        session = Session(session_id, renderer)
-        sessions[session_id] = session
-
     pc = RTCPeerConnection()
+    pc.configuration.iceServers = get_ice_servers()
+    session = create_session(session_id, pc)
     track = FrameProducer(session)
     pc.addTrack(track)
 
