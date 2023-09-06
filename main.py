@@ -8,6 +8,7 @@ import av
 from aiortc import RTCPeerConnection, RTCSessionDescription, RTCIceCandidate, RTCConfiguration, VideoStreamTrack
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from scipy.spatial.transform import Rotation
 
@@ -30,10 +31,12 @@ with open(camera_path, "r") as f:
 
 
 # initialize server
+origins = ["https://viewer.dylanebert.com", "https://dylanebert-gaussian-viewer.hf.space"]
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -198,3 +201,6 @@ async def create_offer(offer: Offer, session_id: str = Query(...)):
 @app.get("/ice-servers")
 async def get_ice():
     return get_ice_servers()
+
+
+app.mount("/", StaticFiles(directory="gaussian-viewer-frontend/public", html=True), name="public")
