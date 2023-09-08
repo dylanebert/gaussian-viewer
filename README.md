@@ -110,11 +110,22 @@ docker build -t gaussian-viewer .
 docker run --gpus all -p 8000:8000 gaussian-viewer
 ```
 
-### STUN/TURN
+### Local Configuration
+
+#### Change Addresses
+
+When running locally, you will need to update the addresses to point toward the local implementation, rather than the remote server.
+
+- In `gaussian-viewer-frontend/src/src/routes/+page.svelte`, replace `https://viewer.dylanebert.com/` with `http://localhost:8000/`.
+- In `main.py`, replace `origins = ["https://viewer.dylanebert.com", "https://dylanebert-gaussian-viewer.hf.space"]` with `origins = ["*"]` to allow all origins.
+
+#### STUN/TURN
 
 WebRTC typically requires STUN/TURN servers to function on web. However, this shouldn't be an issue when running locally.
 
 The provided implementation is configured to fetch ICE servers from [twilio](https://www.twilio.com/en-us) using private credentials. You can provide your own credentials, replace them with other ICE servers, or ignore them when running locally.
+
+To ignore them when running locally, in `gaussian-viewer-frontend/src/src/routes/+page.svelte` in `connectToPeer`, remove the `iceServers` fetch and simply pass `iceServers: []`.
 
 ## Project Layout
 
