@@ -35,9 +35,9 @@ Be sure to use the `--recursive` flag to clone the local dependencies:
 
 ## Downloading Models
 
-This project is currently hardcoded to run the bicycle example from the [Mip-NeRF 360](https://jonbarron.info/mipnerf360/) dataset.
+This project is currently hardcoded to run the trained bicycle example from the [Mip-NeRF 360](https://jonbarron.info/mipnerf360/) dataset.
 
-Click [here](http://storage.googleapis.com/gresearch/refraw360/360_v2.zip) to download the 12GB Mip-NeRF 360 dataset. Unzip the archive, then copy the contained `bicycle` folder to this repository's `models` folder.
+Click [here](https://viewer.dylanebert.com/models) to download the data. Unzip the archive, then copy the contained `bicycle` folder to this repository's `models` folder.
 
 ## Running locally
 

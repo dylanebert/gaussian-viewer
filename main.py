@@ -9,6 +9,7 @@ from aiortc import RTCPeerConnection, RTCSessionDescription, RTCIceCandidate, RT
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from scipy.spatial.transform import Rotation
 
@@ -201,6 +202,11 @@ async def create_offer(offer: Offer, session_id: str = Query(...)):
 @app.get("/ice-servers")
 async def get_ice():
     return get_ice_servers()
+
+
+@app.get("/models", response_class=FileResponse)
+async def download_models():
+    return FileResponse("models/models.zip")
 
 
 app.mount("/", StaticFiles(directory="gaussian-viewer-frontend/public", html=True), name="public")
